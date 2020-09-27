@@ -2,10 +2,10 @@
 #**********************************************************#
 # Emine Ozsahin
 # April 27 2020
-# GISIAD Canada sequences downloaded 
-# 147 Covid19 genome aligned (MAFFT) in graham
+# SARS-CoV2 Canada sequences were downloaded from GISIAD (https://www.gisaid.org/)
+# 147 SARS-CoV2 genomes were aligned using MAFFT in compute canada graham
 # alignment converted to the VCF file (SNP-sites) in my computer 
-# alignment and vcf were converted into cluster analysis seperately.
+# alignment and vcf were used for cluster analysis seperately.
 # vcf is also used for PCA 
 # try factor analysis with vcf
 # try regression if you have population data
@@ -20,6 +20,7 @@ setwd("/Users/emineozsahin/Documents/R_worksheets_winter2020/Coronavirus_BVES")
 ##=========================================================*
 #**********************************************************#
 
+# Not all of these libraries necessary
 library(seqinr)
 library(cluster)
 library(dendextend)
@@ -89,25 +90,15 @@ d <- dist.alignment(aln, matrix=c("similarity"))
 head(as.data.frame(d))
 class(d)
 
-#Perfect heatmap + cluster for individuals
+# heatmap + cluster for individuals
 
 # convert the distances to a dataframe 
 z <- apply(as.data.frame(as.matrix(d)), 2, as.numeric)
 dim(z)
 rownames(z) <- colnames(z)
 
-# Some options which I did not use
-#my_palette <- colorRampPalette(c("red", "yellow", "green"))(n = 147)
 
-# (optional) defines the color breaks manually for a "skewed" color transition
-#col_breaks = c(seq(-1,0,length=100),  # for red
-               #seq(0.01,0.8,length=100),           # for yellow
-               #seq(0.81,1,length=100))             # for green
-
-# siply plot I don't like the shape 
-#heatmap.2(z)
-
-# This is better but there is an issue with names they do not match
+# 
 heatmap.2(z,
           #cellnote = mat_data,  # same data set for cell labels
           #main = "Correlation", # heat map title
@@ -134,7 +125,7 @@ d3heatmap(scale(z), colors = "RdYlBu",
 )
 dev.off()
  
-#Enhanced heat maps, it is good no problem
+#Enhanced heat maps
 png("enhanced_heat.png", units="in", width=10, height=10, res=300)
 heatmap.2(z, scale = "none", col = bluered(100), 
           trace = "none", density.info = "none")
@@ -149,14 +140,14 @@ dev.off()
 hc <- hclust(d)
 dhc <- as.dendrogram(hc)
 
-# Fix the label size !!!!!!!!!!!!!!!!!!!!
+# 
 plot(dhc)
 
 # Horizontal plot
 nodePar <- list(lab.cex = 0.6, pch = c(NA, 19), 
                 cex = 0.7, col = "blue")
 
-# Fix the label size !!!!!!!!!!!!!!!
+# 
 plot(dhc, xlab = "Height", nodePar = nodePar, horiz = TRUE)
 
 #change the labes to numbers then color
@@ -497,18 +488,6 @@ grid.newpage()
 print(dist.plot, vp = viewport(x = 0.4, y = 0.5, width = 0.8, height = 1.0))
 print(dendro.plot, vp = viewport(x = 0.90, y = 0.43, width = 0.2, height = 0.92))
 
-##*********************************************
-# The standard R code for computing hierarchical clustering looks like this:
-# Compute dissimilarity matrix
-res.dist <- dist(as.data.frame(Variant_num), method = "euclidean") #The standard R code for computing hierarchical clustering looks like this:
-
-# Compute hierarchical clustering
-res.hc <- hclust(res.dist, method = "ward.D2")#The standard R code for computing hierarchical clustering looks like this:
-
-# Visualize
-plot(res.hc, cex = 0.5)#The standard R code for computing hierarchical clustering looks like this:
-##*********************************************
-
 
 # Correlation-based distance method
 res.dist <- get_dist(as.data.frame(Variant), method = "pearson")
@@ -551,25 +530,6 @@ fviz_silhouette(res.hc) # silhouette plot
 fviz_cluster(res.hc) # scatter plot
 
 eclust(as.data.frame(Variant), "kmeans", k = 8)
-
-##*********************************************
-#PUBMED SEARCH
-##*********************************************
-l <- (read.table("pubmed_result.txt", sep = "\t"))
-
-l$V1
-
-strsplit(l$V1, ".")
-
-?strsplit
-
-l1 <- as.data.frame(unlist(strsplit(as.character(l$V1), "\t")))
-
-l1 <- as.data.frame(strsplit(as.character(l$V1), "/n"))
-
-l1
-
-summary(l$V1)
 
 
 # Heatmap
